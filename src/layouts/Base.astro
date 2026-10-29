@@ -56,7 +56,7 @@ const ld = [orgSchema, ...schema];
   <title>{title}</title>
   <meta name="description" content={description} />
   <link rel="canonical" href={canonical} />
-  {noindex && <meta name="robots" content="noindex, follow" />}
+  {(noindex || import.meta.env.PUBLIC_NOINDEX === '1') && <meta name="robots" content="noindex, follow" />}
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <meta name="theme-color" content="#8a1a28" />
   <meta name="format-detection" content="telephone=no" />
