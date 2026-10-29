@@ -1,0 +1,165 @@
+---
+// Форма заявки с прикреплением чертежей. Отправляется на /send (functions/send.js: Telegram + почта).
+import Icon from './Icon.astro';
+import { services } from '../data/services';
+
+interface Props { id: string; dark?: boolean; compact?: boolean; service?: string }
+const { id, dark = false, compact = false, service = '' } = Astro.props;
+---
+<form class:list={['rf', { 'rf--dark': dark }]} action="/send" method="post" enctype="multipart/form-data" novalidate data-request-form>
+  <div class="rf__grid">
+    <div class="field">
+      <label for={`${id}-name`}>Имя</label>
+      <input class="input" id={`${id}-name`} name="name" autocomplete="name" placeholder="Как к вам обращаться" />
+    </div>
+    <div class="field">
+      <label for={`${id}-phone`}>Телефон *</label>
+      <input class="input" id={`${id}-phone`} name="phone" type="tel" autocomplete="tel" placeholder="+375 (__) ___-__-__" required />
+    </div>
+    {!compact && (
+      <div class="field">
+        <label for={`${id}-email`}>E-mail</label>
+        <input class="input" id={`${id}-email`} name="email" type="email" autocomplete="email" placeholder="для отправки КП" />
+      </div>
+    )}
+    {!compact && (
+      <div class="field">
+        <label for={`${id}-service`}>Услуга</label>
+        <select class="input" id={`${id}-service`} name="service">
+          <option value="">Не знаю / несколько</option>
+          {services.map((s) => <option value={s.title} selected={s.title === service}>{s.title}</option>)}
+        </select>
+      </div>
+    )}
+    <div class="field rf__wide">
+      <label for={`${id}-msg`}>Задача</label>
+      <textarea class="input" id={`${id}-msg`} name="message" rows={compact ? 3 : 4}
+        placeholder="Материал, толщина, количество, сроки — всё, что знаете"></textarea>
+    </div>
+
+    <label class="rf__file rf__wide">
+      <input type="file" name="files[]" multiple
+        accept=".dxf,.dwg,.step,.stp,.igs,.iges,.x_t,.pdf,.jpg,.jpeg,.png,.zip,.rar,.7z" data-files />
+      <span class="rf__file-icon"><Icon name="upload" /></span>
+      <span class="rf__file-text">
+        <strong data-files-label>Прикрепить чертёж</strong>
+        <small>DXF, DWG, STEP, PDF, фото, архив — до 5 файлов, 20 МБ</small>
+      </span>
+    </label>
+
+    <!-- защита от спама: поле не видно людям -->
+    <input type="text" name="website" tabindex="-1" autocomplete="off" class="visually-hidden" aria-hidden="true" />
+    <input type="hidden" name="page" data-page />
+  </div>
+
+  <label class="rf__consent">
+    <input type="checkbox" name="consent" required checked />
+    <span>Согласен на обработку персональных данных в соответствии с <a href="/privacy/" target="_blank">политикой</a></span>
+  </label>
+
+  <button class="btn btn--block rf__submit" type="submit">
+    <span>Получить расчёт</span> <Icon name="arrow" />
+  </button>
+  <p class="rf__status" role="status" aria-live="polite" data-status></p>
+</form>
+
+<style>
+  .rf__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .rf__wide { grid-column: 1 / -1; }
+  @media (max-width: 560px) { .rf__grid { grid-template-columns: 1fr; } }
+
+  .rf__file {
+    display: flex; align-items: center; gap: 16px; padding: 16px 18px; cursor: pointer;
+    border: 1.5px dashed var(--steel-400); border-radius: var(--radius); background: var(--steel-50);
+    transition: border-color .2s, background .2s;
+  }
+  .rf__file:hover, .rf__file.is-filled { border-color: var(--red); background: rgb(138 26 40 / .04); }
+  .rf__file input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+  .rf__file:focus-within { outline: 2px solid var(--red-400); outline-offset: 2px; }
+  .rf__file-icon { display: grid; place-items: center; width: 44px; height: 44px; flex: none; border-radius: 50%; background: var(--red); color: var(--white); }
+  .rf__file-icon svg { width: 20px; height: 20px; }
+  .rf__file-text { display: grid; line-height: 1.35; min-width: 0; }
+  .rf__file-text strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .rf__file-text small { color: var(--steel-600); font-size: .8rem; }
+
+  .rf__consent { display: flex; gap: 10px; align-items: flex-start; margin: 18px 0; font-size: .82rem; color: var(--steel-600); line-height: 1.45; }
+  .rf__consent input { margin-top: 2px; accent-color: var(--red); width: 16px; height: 16px; flex: none; }
+  .rf__submit[disabled] { opacity: .6; pointer-events: none; }
+  .rf__status { margin: 12px 0 0; font-size: .9rem; min-height: 1.4em; }
+  .rf__status.is-ok { color: #1f7a3a; font-weight: 600; }
+  .rf__status.is-err { color: var(--red); font-weight: 600; }
+
+  .rf--dark .field label, .rf--dark .rf__consent { color: var(--steel-400); }
+  .rf--dark .input { background: var(--graphite-2); border-color: #3a3a40; color: var(--white); }
+  .rf--dark .input::placeholder { color: #77777e; }
+  .rf--dark .rf__file { background: var(--graphite-2); border-color: #4a4a50; }
+  .rf--dark .rf__file-text small { color: var(--steel-400); }
+  .rf--dark .rf__status.is-ok { color: #6fd18f; }
+  .rf--dark .rf__status.is-err { color: #ff8a96; }
+</style>
+
+<script>
+  import { reachGoal } from '../scripts/metrika';
+
+  const MAX_FILES = 5;
+  const MAX_SIZE = 20 * 1024 * 1024;
+
+  document.querySelectorAll<HTMLFormElement>('[data-request-form]').forEach((form) => {
+    if (form.dataset.ready) return;
+    form.dataset.ready = '1';
+
+    const fileInput = form.querySelector<HTMLInputElement>('[data-files]')!;
+    const fileLabel = form.querySelector<HTMLElement>('[data-files-label]')!;
+    const status = form.querySelector<HTMLElement>('[data-status]')!;
+    const submit = form.querySelector<HTMLButtonElement>('[type=submit]')!;
+    form.querySelector<HTMLInputElement>('[data-page]')!.value = location.href;
+
+    fileInput.addEventListener('change', () => {
+      const files = Array.from(fileInput.files ?? []);
+      fileInput.closest('.rf__file')?.classList.toggle('is-filled', files.length > 0);
+      fileLabel.textContent = files.length
+        ? files.length === 1 ? files[0].name : `Файлов: ${files.length}`
+        : 'Прикрепить чертёж';
+    });
+
+    const setStatus = (text: string, kind: 'ok' | 'err' | '' = '') => {
+      status.textContent = text;
+      status.className = 'rf__status' + (kind ? ` is-${kind}` : '');
+    };
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const phone = form.querySelector<HTMLInputElement>('[name=phone]')!;
+      if (phone.value.replace(/\D/g, '').length < 7) {
+        setStatus('Укажите телефон, чтобы мы могли связаться с вами', 'err');
+        phone.focus();
+        return;
+      }
+      if (!form.querySelector<HTMLInputElement>('[name=consent]')!.checked) {
+        setStatus('Нужно согласие на обработку данных', 'err');
+        return;
+      }
+      const files = Array.from(fileInput.files ?? []);
+      if (files.length > MAX_FILES || files.some((f) => f.size > MAX_SIZE)) {
+        setStatus(`Не более ${MAX_FILES} файлов до 20 МБ каждый. Большие файлы пришлите на почту.`, 'err');
+        return;
+      }
+
+      submit.disabled = true;
+      setStatus('Отправляем…');
+      try {
+        const res = await fetch(form.action, { method: 'POST', body: new FormData(form) });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok || !data.ok) throw new Error(data.error || 'send failed');
+        setStatus('Спасибо! Заявка отправлена — свяжемся с вами в течение часа в рабочее время.', 'ok');
+        reachGoal('form_submit');
+        form.reset();
+        fileInput.dispatchEvent(new Event('change'));
+      } catch {
+        setStatus('Не удалось отправить. Позвоните нам или напишите на order@dsmet.by', 'err');
+      } finally {
+        submit.disabled = false;
+      }
+    });
+  });
+</script>

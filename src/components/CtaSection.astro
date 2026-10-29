@@ -1,0 +1,52 @@
+---
+// Блок «Отправьте чертёж» с формой — ставится внизу почти каждой страницы
+import RequestForm from './RequestForm.astro';
+import Icon from './Icon.astro';
+import { site, tel } from '../data/site';
+
+interface Props { title?: string; service?: string }
+const { title = 'Пришлите чертёж — рассчитаем стоимость за 1 час', service } = Astro.props;
+---
+<section class="cta section section--dark" id="zayavka">
+  <div class="container cta__grid">
+    <div class="cta__info reveal">
+      <span class="eyebrow">Заявка на расчёт</span>
+      <h2>{title}</h2>
+      <p class="cta__lead">Технолог изучит задачу, предложит оптимальную технологию и назовёт точную цену и срок. Расчёт бесплатный и ни к чему не обязывает.</p>
+      <ul class="cta__points">
+        <li><Icon name="file" /> DXF, DWG, STEP, PDF или фото эскиза</li>
+        <li><Icon name="clock" /> Ответ в течение часа в рабочее время</li>
+        <li><Icon name="shield" /> Договор, счёт, закрывающие документы</li>
+      </ul>
+      <div class="cta__contacts">
+        {site.phones.slice(0, 2).map((p) => (
+          <a href={tel(p.number)}><strong>{p.number}</strong><small>{p.label}</small></a>
+        ))}
+        <a href={`mailto:${site.emails[0].email}`}><strong>{site.emails[0].email}</strong><small>Чертежи на почту</small></a>
+      </div>
+    </div>
+    <div class="cta__form reveal">
+      <RequestForm id="cta" dark service={service} />
+    </div>
+  </div>
+</section>
+
+<style>
+  .cta { position: relative; overflow: hidden; }
+  .cta::before {
+    content: ''; position: absolute; left: -120px; top: 0; bottom: 0; width: 90px;
+    background: var(--red); transform: skewX(-18deg); opacity: .9;
+  }
+  .cta__grid { display: grid; grid-template-columns: 1fr 1.05fr; gap: clamp(32px, 6vw, 80px); align-items: start; }
+  .cta__lead { color: var(--steel-400); margin: 20px 0 28px; }
+  .cta__points { list-style: none; padding: 0; margin: 0 0 32px; display: grid; gap: 14px; }
+  .cta__points li { display: flex; gap: 12px; align-items: center; color: var(--steel-100); }
+  .cta__points svg { color: var(--red-400); flex: none; }
+  .cta__contacts { display: flex; flex-wrap: wrap; gap: 20px 36px; padding-top: 28px; border-top: 1px solid #333338; }
+  .cta__contacts a { display: grid; text-decoration: none; }
+  .cta__contacts strong { color: var(--white); font-size: 1.1rem; }
+  .cta__contacts a:hover strong { color: var(--red-400); }
+  .cta__contacts small { color: var(--steel-400); font-size: .8rem; }
+  .cta__form { background: #18181b; border: 1px solid #2c2c31; border-top: 4px solid var(--red); padding: clamp(20px, 3.5vw, 40px); border-radius: var(--radius); }
+  @media (max-width: 900px) { .cta__grid { grid-template-columns: 1fr; } .cta::before { display: none; } }
+</style>

@@ -1,0 +1,111 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import CtaSection from '../components/CtaSection.astro';
+import Icon from '../components/Icon.astro';
+import { site } from '../data/site';
+import overview from '../assets/photos/hero-shop.jpg';
+import shop from '../assets/photos/welding-shop.jpg';
+import team from '../assets/photos/assembly.jpg';
+
+const values = [
+  { title: 'Точность', text: 'Работаем по чертежу до сотых долей миллиметра и проверяем размеры на каждой операции.' },
+  { title: 'Ответственность за сроки', text: 'Называем реальный срок и держим его. Если что-то меняется — сообщаем заранее.' },
+  { title: 'Открытость', text: 'Прозрачный расчёт стоимости, договор и полный пакет документов. Можно приехать и посмотреть производство.' },
+];
+---
+<Base
+  title="О компании ДС-Металл — производство металлоизделий в Минске"
+  description="ООО «ДС-Металл» — металлообрабатывающее производство в Минске: 1000 м² цеха, 50+ единиц оборудования, полный цикл от резки до сварки. Работаем с юрлицами и ИП."
+>
+  <PageHero title="О компании" image={overview} crumbs={[{ label: 'О компании' }]}
+    lead={`${site.legalName} — металлообрабатывающее производство в Минске. Изготавливаем детали и металлоконструкции по чертежам заказчиков.`} />
+
+  <section class="section">
+    <div class="container about">
+      <div class="reveal">
+        <span class="eyebrow">Кто мы</span>
+        <h2>Производство, а не посредник</h2>
+        <div class="prose" style="margin-top:24px">
+          <p>Все работы выполняем на собственном оборудовании в цехе площадью 1000 м² на ул. Ф. Скорины в Минске. Это позволяет контролировать качество, сроки и стоимость на каждом этапе.</p>
+          <p>В парке — более 50 единиц оборудования: оптоволоконные лазеры для резки листа и труб, обрабатывающие центры с ЧПУ, токарные станки, ленточнопильные станки и оборудованный сварочный участок.</p>
+          <p>Работаем с промышленными предприятиями, производителями оборудования, строительными и монтажными компаниями. Берём как единичные заказы, так и серийное производство.</p>
+        </div>
+      </div>
+      <div class="about__media reveal">
+        <Image src={shop} alt="Сварочный участок" widths={[480, 800]} sizes="(max-width: 900px) 100vw, 40vw" />
+        <Image src={team} alt="Слесарная доработка изделий" widths={[400, 700]} sizes="(max-width: 900px) 50vw, 20vw" />
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--dark">
+    <div class="container">
+      <dl class="about-stats reveal">
+        {site.stats.map((s) => <div><dd>{s.value}</dd><dt>{s.label}</dt></div>)}
+      </dl>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-head reveal"><div><span class="eyebrow">Принципы</span><h2>Как мы работаем с клиентами</h2></div></div>
+      <div class="grid grid-3">
+        {values.map((v, i) => (
+          <div class="value reveal">
+            <span class="value__num">{String(i + 1).padStart(2, '0')}</span>
+            <h3>{v.title}</h3>
+            <p>{v.text}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--steel">
+    <div class="container req reveal">
+      <div>
+        <span class="eyebrow">Реквизиты</span>
+        <h2>{site.legalName}</h2>
+      </div>
+      <dl class="req__list">
+        <div><dt>УНП</dt><dd>{site.unp}</dd></div>
+        <div><dt>Адрес</dt><dd>{site.address.full}</dd></div>
+        <div><dt>Время работы</dt><dd>{site.hours}</dd></div>
+        <div><dt>E-mail</dt><dd><a href={`mailto:${site.emails[2].email}`}>{site.emails[2].email}</a></dd></div>
+      </dl>
+      <a href="/contact/" class="link-arrow">Все контакты <Icon name="arrow" /></a>
+    </div>
+  </section>
+
+  <CtaSection />
+</Base>
+
+<style>
+  .about { display: grid; grid-template-columns: 1.1fr 1fr; gap: clamp(32px, 6vw, 80px); align-items: center; }
+  .about__media { display: grid; grid-template-columns: 1.4fr 1fr; gap: 12px; }
+  .about__media img { width: 100%; height: 420px; object-fit: cover; border-radius: var(--radius); }
+  .about-stats { display: grid; grid-template-columns: repeat(4, 1fr); margin: 0; gap: 24px; }
+  .about-stats div { display: flex; flex-direction: column-reverse; border-left: 3px solid var(--red); padding-left: 20px; }
+  .about-stats dd { margin: 0; font-size: clamp(2rem, 4vw, 3rem); font-weight: 800; color: var(--white); }
+  .about-stats dt { color: var(--steel-400); }
+  .value { padding: 32px 28px; border: 1px solid var(--steel-100); border-radius: var(--radius); }
+  .value__num { font-size: 2.4rem; font-weight: 800; color: var(--red); line-height: 1; }
+  .value h3 { margin: 16px 0 10px; }
+  .value p { margin: 0; color: var(--steel-600); }
+  .req { display: grid; grid-template-columns: 1fr 1.4fr; gap: 24px 64px; align-items: start; }
+  .req .link-arrow { grid-column: 2; }
+  .req__list { margin: 0; background: var(--white); border-radius: var(--radius); padding: 8px 24px; }
+  .req__list div { display: grid; grid-template-columns: 160px 1fr; gap: 16px; padding: 14px 0; border-bottom: 1px solid var(--steel-100); }
+  .req__list div:last-child { border-bottom: 0; }
+  .req__list dt { color: var(--steel-600); }
+  .req__list dd { margin: 0; font-weight: 600; }
+  @media (max-width: 900px) {
+    .about, .req { grid-template-columns: 1fr; }
+    .req .link-arrow { grid-column: 1; }
+    .about-stats { grid-template-columns: 1fr 1fr; }
+    .about__media img { height: 280px; }
+  }
+  @media (max-width: 560px) { .req__list div { grid-template-columns: 1fr; gap: 2px; } }
+</style>

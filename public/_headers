@@ -1,0 +1,9 @@
+# Настройки Cloudflare Pages
+
+# Тестовый адрес *.pages.dev не индексируется поисковиками (индексируется только dsmet.by)
+https://:project.pages.dev/*
+  X-Robots-Tag: noindex
+
+# Картинки, стили и скрипты с хэшем в имени — кэш на год
+/_astro/*
+  Cache-Control: public, max-age=31536000, immutable

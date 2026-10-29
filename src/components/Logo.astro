@@ -1,0 +1,28 @@
+---
+// Логотип: фирменный знак (из DS-METALL_logo_full.svg) + название
+interface Props { light?: boolean; compact?: boolean }
+const { light = false, compact = false } = Astro.props;
+---
+<a href="/" class:list={['logo', { 'logo--light': light }]} aria-label="ДС-Металл — на главную">
+  <svg class="logo__mark" viewBox="2160 600 960 960" aria-hidden="true">
+    <path fill="currentColor" d="m 2332,1297 v 102 c 46,31 66,46 123,66 55,19 99,24 164,23 76,-2 156,-33 215,-72 17,-12 26,-19 41,-31 4,-4 9,-8 13,-12 37,-38 55,-58 82,-106 65,-115 68,-260 16,-379 -8,-16 -25,-52 -35,-61 -5,4 -8,8 -13,13 l -42,44 c 17,37 23,37 37,89 21,76 13,149 -14,221 -8,21 -34,69 -47,81 V 910 c -4,2 -39,41 -44,47 l -42,47 c -6,7 -3,29 -3,41 l 2,309 c -49,36 -116,53 -179,56 -50,3 -105,-8 -149,-28 l -30,-14 c -2,-1 -3,-1 -5,-3 -4,-3 -2,0 -4,-4 V 945 c 8,4 38,38 47,47 4,4 8,7 12,11 l 35,35 56,-59 c -4,-6 -14,-14 -19,-20 l -41,-39 c -7,-7 -13,-14 -20,-21 -14,-13 -27,-26 -40,-39 -8,-8 -34,-36 -41,-39 l -34,33 c -12,12 -23,24 -35,35 -8,7 -6,9 -6,28 z"/>
+    <path fill="currentColor" d="m 2279,1350 4,-119 c 0,-15 -5,-19 -10,-31 -36,-82 -37,-194 1,-275 18,-40 39,-73 65,-100 90,-96 231,-139 366,-94 27,9 93,41 106,59 -7,9 -17,19 -25,29 l -80,82 c -17,19 -36,37 -53,56 -5,4 -9,8 -14,13 l -187,194 c -7,9 -7,5 -6,20 1,36 1,73 1,108 6,-3 66,-68 74,-77 l 76,-80 c 5,-6 8,-10 14,-16 l 88,-94 c 5,-6 10,-11 15,-16 28,-31 61,-64 89,-94 l 43,-47 c 26,-28 48,-50 74,-81 -8,-14 -41,-41 -53,-53 -18,-16 -44,-32 -65,-44 -47,-27 -101,-44 -162,-52 -63,-7 -130,3 -189,23 -151,51 -267,195 -282,366 -5,65 6,138 27,190 19,45 45,93 79,129 0,1 1,1 2,2 2,2 0,1 2,2 z"/>
+  </svg>
+  {!compact && (
+    <span class="logo__text">
+      <span class="logo__name">ДС-МЕТАЛЛ</span>
+      <span class="logo__sub">• Металлообработка •</span>
+    </span>
+  )}
+</a>
+
+<style>
+  .logo { display: inline-flex; align-items: center; gap: 12px; text-decoration: none; color: var(--ink); }
+  .logo__mark { width: 46px; height: 46px; color: var(--red); flex: none; }
+  .logo__text { display: grid; line-height: 1; white-space: nowrap; }
+  .logo__name { font-weight: 800; font-size: 1.35rem; letter-spacing: .01em; }
+  .logo__sub { margin-top: 5px; font-size: .58rem; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: var(--red); }
+  .logo--light { color: var(--white); }
+  .logo--light .logo__mark { color: var(--red-400); }
+  .logo--light .logo__sub { color: var(--steel-400); }
+</style>

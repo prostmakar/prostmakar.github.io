@@ -1,0 +1,31 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import ServiceCard from '../components/ServiceCard.astro';
+import Process from '../components/Process.astro';
+import CtaSection from '../components/CtaSection.astro';
+import { services } from '../data/services';
+import shop from '../assets/photos/shop-overview.jpg';
+---
+<Base
+  title="Услуги металлообработки в Минске — резка, токарные, фрезерные, сварка | ДС-Металл"
+  description="Все услуги металлообработки ДС-Металл: лазерная резка листа и труб, токарные и фрезерные работы на ЧПУ, ленточнопильная резка, сварка. Полный цикл в Минске."
+>
+  <PageHero title="Услуги металлообработки" image={shop} crumbs={[{ label: 'Услуги' }]}
+    lead="Полный цикл изготовления деталей и металлоконструкций на собственном производстве. Комбинируем операции — вы получаете готовое изделие от одного подрядчика." />
+
+  <section class="section section--steel">
+    <div class="container grid grid-3">
+      {services.map((s, i) => <ServiceCard service={s} index={i} />)}
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-head reveal"><div><span class="eyebrow">Порядок работы</span><h2>Как заказать</h2></div></div>
+      <Process />
+    </div>
+  </section>
+
+  <CtaSection />
+</Base>

@@ -1,0 +1,146 @@
+---
+// Страница услуги. Адрес = slug из src/data/services.ts (например /lazernaya_rezka_metalla/)
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import Icon from '../components/Icon.astro';
+import CtaSection from '../components/CtaSection.astro';
+import Calculator from '../components/Calculator.astro';
+import Process from '../components/Process.astro';
+import { services, type Service } from '../data/services';
+import { priceList, priceNote } from '../data/prices';
+import { site } from '../data/site';
+
+export function getStaticPaths() {
+  return services.map((s) => ({ params: { service: s.slug }, props: { s } }));
+}
+const { s } = Astro.props as { s: Service };
+const prices = priceList.find((p) => p.slug === s.slug);
+const others = services.filter((x) => x.slug !== s.slug);
+
+const serviceSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Service',
+  name: s.title,
+  description: s.seoDescription,
+  areaServed: { '@type': 'Country', name: 'Беларусь' },
+  provider: { '@id': `${site.url}/#org` },
+};
+---
+<Base title={s.seoTitle} description={s.seoDescription} ogImage={s.image} schema={[serviceSchema]}>
+  <PageHero title={s.h1} lead={s.intro} image={s.image}
+    crumbs={[{ label: 'Услуги', href: '/services/' }, { label: s.title }]}>
+    <div class="sv-hero-actions">
+      <a href="#" class="btn" data-request data-request-service={s.title}><Icon name="upload" /> Рассчитать по чертежу</a>
+      <a href="#zayavka" class="btn btn--light">Оставить заявку</a>
+    </div>
+  </PageHero>
+
+  <section class="sv-specs">
+    <div class="container">
+      <dl class="sv-specs__row">
+        {s.specs.map((sp) => <div><dd>{sp.value}</dd><dt>{sp.label}</dt></div>)}
+      </dl>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container sv-main">
+      <div class="reveal">
+        <span class="eyebrow">Возможности</span>
+        <h2>Что входит в услугу</h2>
+        <ul class="checklist sv-list">
+          {s.features.map((f) => <li>{f}</li>)}
+        </ul>
+        <h3 class="sv-sub">Материалы</h3>
+        <ul class="tags">{s.materials.map((m) => <li>{m}</li>)}</ul>
+      </div>
+      <div class="sv-gallery reveal">
+        {s.gallery.map((img, i) => (
+          <Image src={img} alt={`${s.title} — фото ${i + 1}`} widths={[480, 800, 1200]}
+            sizes="(max-width: 900px) 100vw, 50vw" class:list={{ 'is-main': i === 0 }} />
+        ))}
+      </div>
+    </div>
+  </section>
+
+  {prices && (
+    <section class="section section--steel">
+      <div class="container">
+        <div class="section-head reveal">
+          <div>
+            <span class="eyebrow">Цены</span>
+            <h2>Стоимость: {s.title.toLowerCase()}</h2>
+          </div>
+          <p>{priceNote}</p>
+        </div>
+        <div class="price-table reveal">
+          {prices.rows.map(([name, price]) => (
+            <div class="price-table__row"><span>{name}</span><strong>{price}</strong></div>
+          ))}
+        </div>
+        {s.slug === 'lazernaya_rezka_metalla' && <div class="reveal" style="margin-top:48px"><Calculator /></div>}
+      </div>
+    </section>
+  )}
+
+  <section class="section">
+    <div class="container">
+      <div class="section-head reveal">
+        <div><span class="eyebrow">Порядок работы</span><h2>Как заказать</h2></div>
+      </div>
+      <Process />
+    </div>
+  </section>
+
+  <CtaSection service={s.title} title={`Рассчитаем стоимость: ${s.title.toLowerCase()}`} />
+
+  <section class="section section--steel">
+    <div class="container sv-bottom">
+      <div class="prose">
+        <h2 style="margin-bottom:20px">{s.title} в Минске</h2>
+        {s.text.map((p) => <p>{p}</p>)}
+      </div>
+      <aside>
+        <h3 class="sv-sub" style="margin-top:0">Другие услуги</h3>
+        <ul class="sv-others">
+          {others.map((o) => (
+            <li><a href={`/${o.slug}/`}><Icon name={o.icon} /> {o.title}</a></li>
+          ))}
+        </ul>
+      </aside>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .sv-hero-actions { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 32px; }
+  .sv-specs { background: var(--red); color: var(--white); }
+  .sv-specs__row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); margin: 0; }
+  .sv-specs__row div { display: flex; flex-direction: column-reverse; padding: 26px 24px; border-left: 1px solid rgb(255 255 255 / .2); }
+  .sv-specs__row div:first-child { border-left: 0; padding-left: 0; }
+  .sv-specs__row dd { margin: 0; font-size: clamp(1.5rem, 2.6vw, 2.1rem); font-weight: 800; line-height: 1.1; }
+  .sv-specs__row dt { font-size: .85rem; opacity: .8; }
+
+  .sv-main { display: grid; grid-template-columns: 1fr 1.1fr; gap: clamp(32px, 6vw, 80px); align-items: start; }
+  .sv-list { margin: 28px 0 36px; }
+  .sv-sub { font-size: 1rem; text-transform: uppercase; letter-spacing: .12em; margin: 0 0 14px; color: var(--steel-600); }
+  .sv-gallery { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .sv-gallery img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: var(--radius); }
+  .sv-gallery img.is-main, .sv-gallery img:last-child:nth-child(even) { grid-column: 1 / -1; aspect-ratio: 16 / 10; }
+
+  .price-table { background: var(--white); border: 1px solid var(--steel-100); border-radius: var(--radius); }
+  .price-table__row { display: flex; justify-content: space-between; gap: 16px; padding: 18px 24px; border-bottom: 1px solid var(--steel-100); }
+  .price-table__row:last-child { border-bottom: 0; }
+  .price-table__row strong { color: var(--red); white-space: nowrap; }
+
+  .sv-bottom { display: grid; grid-template-columns: 1.6fr 1fr; gap: 64px; }
+  .sv-others { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+  .sv-others a { display: flex; align-items: center; gap: 12px; padding: 14px 16px; background: var(--white); border-radius: var(--radius); text-decoration: none; font-weight: 600; border: 1px solid var(--steel-100); transition: border-color .2s, color .2s; }
+  .sv-others a:hover { border-color: var(--red); color: var(--red); }
+  .sv-others svg { color: var(--red); flex: none; }
+  @media (max-width: 900px) {
+    .sv-main, .sv-bottom { grid-template-columns: 1fr; }
+    .sv-specs__row div { padding-left: 0; border-left: 0; padding-block: 16px; }
+  }
+</style>

@@ -1,0 +1,74 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import CtaSection from '../components/CtaSection.astro';
+import Icon from '../components/Icon.astro';
+import { equipment } from '../data/equipment';
+import { site } from '../data/site';
+import hall from '../assets/photos/shop-top.jpg';
+---
+<Base
+  title="Оборудование для металлообработки — лазер, ЧПУ, сварка | ДС-Металл"
+  description="Парк оборудования ДС-Металл: оптоволоконный лазер 2000×6000, лазерный труборез, обрабатывающие центры VMC1200 и WB630, токарные станки с ЧПУ, сварочный участок."
+>
+  <PageHero title="Оборудование" image={hall} crumbs={[{ label: 'Оборудование' }]}
+    lead="Более 50 единиц оборудования на площади 1000 м². Современные станки с ЧПУ позволяют держать точность и сроки даже на больших сериях." />
+
+  <section class="eq-stats">
+    <div class="container">
+      <dl class="eq-stats__row">
+        {site.stats.map((s) => <div><dd>{s.value}</dd><dt>{s.label}</dt></div>)}
+      </dl>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container eq-list">
+      {equipment.map((e, i) => (
+        <article class="eq reveal">
+          <div class="eq__media">
+            <Image src={e.image} alt={e.name} widths={[480, 800, 1100]} sizes="(max-width: 900px) 100vw, 45vw" />
+          </div>
+          <div class="eq__body">
+            <span class="eq__group">{String(i + 1).padStart(2, '0')} · {e.group}</span>
+            <h2>{e.name}</h2>
+            <dl class="eq__specs">
+              {e.specs.map(([k, v]) => <div><dt>{k}</dt><dd>{v}</dd></div>)}
+            </dl>
+            {e.service && <a href={`/${e.service}/`} class="link-arrow">Подробнее об услуге <Icon name="arrow" /></a>}
+          </div>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <CtaSection />
+</Base>
+
+<style>
+  .eq-stats { background: var(--red); color: var(--white); }
+  .eq-stats__row { display: grid; grid-template-columns: repeat(4, 1fr); margin: 0; }
+  .eq-stats__row div { display: flex; flex-direction: column-reverse; padding: 26px 24px; border-left: 1px solid rgb(255 255 255 / .2); }
+  .eq-stats__row div:first-child { border-left: 0; padding-left: 0; }
+  .eq-stats__row dd { margin: 0; font-size: clamp(1.5rem, 2.6vw, 2.1rem); font-weight: 800; }
+  .eq-stats__row dt { font-size: .85rem; opacity: .8; }
+  @media (max-width: 760px) { .eq-stats__row { grid-template-columns: 1fr 1fr; } .eq-stats__row div { border: 0; padding-left: 0; } }
+
+  .eq-list { display: grid; gap: clamp(40px, 6vw, 72px); }
+  .eq { display: grid; grid-template-columns: 1.1fr 1fr; gap: clamp(24px, 5vw, 64px); align-items: center; }
+  .eq:nth-child(even) .eq__media { order: 2; }
+  .eq__media { overflow: hidden; border-radius: var(--radius); }
+  .eq__media img { width: 100%; aspect-ratio: 16 / 10; object-fit: cover; }
+  .eq__group { display: block; font-size: .78rem; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--red); margin-bottom: 12px; }
+  .eq h2 { font-size: clamp(1.5rem, 2.6vw, 2rem); margin-bottom: 24px; }
+  .eq__specs { margin: 0 0 24px; border-top: 1px solid var(--steel-200); }
+  .eq__specs div { display: grid; grid-template-columns: 180px 1fr; gap: 16px; padding: 12px 0; border-bottom: 1px solid var(--steel-200); }
+  .eq__specs dt { color: var(--steel-600); font-size: .92rem; }
+  .eq__specs dd { margin: 0; font-weight: 700; }
+  @media (max-width: 900px) {
+    .eq { grid-template-columns: 1fr; }
+    .eq:nth-child(even) .eq__media { order: 0; }
+    .eq__specs div { grid-template-columns: 1fr; gap: 2px; }
+  }
+</style>

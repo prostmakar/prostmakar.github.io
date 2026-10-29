@@ -1,0 +1,56 @@
+---
+// Всплывающее окно заявки. Открывается любой ссылкой/кнопкой с атрибутом data-request.
+// data-request-service="Лазерная резка металла" — выбрать услугу
+// data-request-msg="..." — подставить текст в поле «Задача»
+import RequestForm from './RequestForm.astro';
+import Icon from './Icon.astro';
+import { site, mainPhone, tel } from '../data/site';
+---
+<dialog class="modal" data-modal aria-labelledby="modal-title">
+  <div class="modal__box">
+    <button class="modal__close" type="button" aria-label="Закрыть" data-modal-close><Icon name="close" /></button>
+    <div class="modal__head">
+      <span class="eyebrow">Расчёт за 1 час</span>
+      <h2 id="modal-title">Пришлите чертёж — рассчитаем стоимость</h2>
+      <p>Или позвоните: <a href={tel(mainPhone.number)}>{mainPhone.number}</a> · {site.hours}</p>
+    </div>
+    <RequestForm id="modal" />
+  </div>
+</dialog>
+
+<style>
+  .modal { border: 0; padding: 0; background: transparent; max-width: min(720px, calc(100vw - 24px)); width: 100%; max-height: calc(100dvh - 24px); }
+  .modal::backdrop { background: rgb(15 15 17 / .78); }
+  .modal[open] { animation: modal-in .3s var(--ease); }
+  @keyframes modal-in { from { opacity: 0; transform: translateY(16px); } }
+  .modal__box { position: relative; background: var(--white); border-top: 4px solid var(--red); border-radius: var(--radius); padding: clamp(24px, 4vw, 44px); }
+  .modal__close { position: absolute; top: 12px; right: 12px; width: 44px; height: 44px; display: grid; place-items: center; background: none; border: 0; cursor: pointer; color: var(--steel-600); }
+  .modal__close:hover { color: var(--ink); }
+  .modal__head h2 { font-size: clamp(1.4rem, 3vw, 1.9rem); margin-bottom: 10px; padding-right: 32px; }
+  .modal__head p { color: var(--steel-600); font-size: .95rem; margin-bottom: 24px; }
+  .modal__head a { font-weight: 700; text-decoration: none; color: var(--red); white-space: nowrap; }
+</style>
+
+<script>
+  const modal = document.querySelector<HTMLDialogElement>('[data-modal]')!;
+
+  document.addEventListener('click', (e) => {
+    const trigger = (e.target as HTMLElement).closest<HTMLElement>('[data-request]');
+    if (!trigger) return;
+    e.preventDefault();
+    const { requestService, requestMsg } = trigger.dataset;
+    if (requestService) {
+      const sel = modal.querySelector<HTMLSelectElement>('[name=service]');
+      if (sel) sel.value = requestService;
+    }
+    if (requestMsg) {
+      const msg = modal.querySelector<HTMLTextAreaElement>('[name=message]');
+      if (msg) msg.value = requestMsg;
+    }
+    modal.showModal();
+  });
+
+  modal.querySelector('[data-modal-close]')?.addEventListener('click', () => modal.close());
+  // закрытие по клику на затемнённый фон
+  modal.addEventListener('click', (e) => { if (e.target === modal) modal.close(); });
+</script>

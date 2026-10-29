@@ -1,0 +1,89 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import CtaSection from '../components/CtaSection.astro';
+import { projects } from '../data/projects';
+import frames from '../assets/photos/welding-frames.jpg';
+
+const done = projects.filter((p) => p.status === 'done');
+const soon = projects.filter((p) => p.status === 'soon');
+---
+<Base
+  title="Проекты и продукция — примеры работ по металлообработке | ДС-Металл"
+  description="Выполненные проекты ДС-Металл: сварные рамы, кронштейны, детали на ЧПУ. Собственная продукция — скоро в продаже."
+>
+  <PageHero title="Проекты" image={frames} crumbs={[{ label: 'Проекты' }]}
+    lead="Примеры выполненных заказов и собственная продукция ДС-Металл. Каждый проект — это конкретная задача клиента, решённая на нашем производстве." />
+
+  <section class="section">
+    <div class="container">
+      <div class="section-head reveal">
+        <div><span class="eyebrow">Выполненные работы</span><h2>Реализованные проекты</h2></div>
+      </div>
+      <div class="pj-list">
+        {done.map((p) => (
+          <article class="pj reveal">
+            <Image src={p.image} alt={p.title} widths={[480, 800, 1100]} sizes="(max-width: 900px) 100vw, 45vw" />
+            <div class="pj__body">
+              <span class="pj__cat">{p.category}</span>
+              <h3>{p.title}</h3>
+              <dl>
+                <div><dt>Задача</dt><dd>{p.task}</dd></div>
+                <div><dt>Решение</dt><dd>{p.solution}</dd></div>
+                {p.result && <div><dt>Результат</dt><dd>{p.result}</dd></div>}
+              </dl>
+              <ul class="tags">{p.tags.map((t) => <li>{t}</li>)}</ul>
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--dark">
+    <div class="container">
+      <div class="section-head reveal">
+        <div><span class="eyebrow">Своя продукция</span><h2>Скоро: продукция ДС-Металл</h2></div>
+        <p>Готовим к запуску собственные изделия. Оставьте заявку — сообщим о старте продаж первыми.</p>
+      </div>
+      <div class="grid grid-2">
+        {soon.map((p) => (
+          <article class="soon reveal">
+            <Image src={p.image} alt="" widths={[480, 800]} sizes="(max-width: 680px) 100vw, 50vw" />
+            <div class="soon__body">
+              <span class="soon__badge">Скоро</span>
+              <h3>{p.title}</h3>
+              <p>{p.task} {p.solution}</p>
+              <a href="#" class="btn btn--light" data-request data-request-msg={`Интересует собственная продукция: ${p.title}`}>Узнать о старте</a>
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <CtaSection title="Есть похожая задача? Обсудим" />
+</Base>
+
+<style>
+  .pj-list { display: grid; gap: 32px; }
+  .pj { display: grid; grid-template-columns: 1fr 1.1fr; background: var(--steel-50); border-radius: var(--radius); overflow: hidden; }
+  .pj img { width: 100%; height: 100%; min-height: 300px; object-fit: cover; }
+  .pj__body { padding: clamp(24px, 4vw, 44px); }
+  .pj__cat { font-size: .75rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--red); }
+  .pj h3 { font-size: clamp(1.3rem, 2.2vw, 1.7rem); margin: 10px 0 20px; }
+  .pj dl { margin: 0 0 20px; display: grid; gap: 14px; }
+  .pj dt { font-weight: 700; font-size: .85rem; text-transform: uppercase; letter-spacing: .08em; }
+  .pj dd { margin: 2px 0 0; color: var(--steel-600); }
+  .pj .tags li { background: var(--white); }
+  @media (max-width: 900px) { .pj { grid-template-columns: 1fr; } .pj img { min-height: 0; aspect-ratio: 16 / 10; } }
+
+  .soon { position: relative; overflow: hidden; border-radius: var(--radius); min-height: 380px; display: flex; isolation: isolate; }
+  .soon img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -2; filter: grayscale(.6); }
+  .soon::before { content: ''; position: absolute; inset: 0; z-index: -1; background: linear-gradient(0deg, rgb(15 15 17 / .95) 35%, rgb(15 15 17 / .4)); }
+  .soon__body { margin-top: auto; padding: 32px; }
+  .soon__badge { display: inline-block; padding: 6px 14px; background: var(--red); color: var(--white); font-size: .75rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+  .soon h3 { margin: 16px 0 10px; font-size: 1.5rem; }
+  .soon p { color: var(--steel-400); margin-bottom: 22px; }
+</style>

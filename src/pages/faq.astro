@@ -1,0 +1,31 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import Process from '../components/Process.astro';
+import Faq from '../components/Faq.astro';
+import CtaSection from '../components/CtaSection.astro';
+import img from '../assets/photos/milling-vmc1200.jpg';
+---
+<Base
+  title="Как мы работаем и ответы на вопросы — ДС-Металл"
+  description="Этапы заказа металлообработки в ДС-Металл, форматы чертежей, сроки, оплата и доставка. Ответы на частые вопросы."
+>
+  <PageHero title="Как мы работаем" image={img} crumbs={[{ label: 'Как мы работаем' }]}
+    lead="Прозрачный процесс от заявки до отгрузки. Ниже — этапы работы и ответы на вопросы, которые нам задают чаще всего." />
+
+  <section class="section">
+    <div class="container">
+      <div class="section-head reveal"><div><span class="eyebrow">Этапы</span><h2>От чертежа до готовой детали</h2></div></div>
+      <Process />
+    </div>
+  </section>
+
+  <section class="section section--steel">
+    <div class="container" style="max-width:960px">
+      <div class="section-head reveal"><div><span class="eyebrow">FAQ</span><h2>Частые вопросы</h2></div></div>
+      <Faq />
+    </div>
+  </section>
+
+  <CtaSection title="Остались вопросы? Напишите нам" />
+</Base>

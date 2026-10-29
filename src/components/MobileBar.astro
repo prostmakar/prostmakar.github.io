@@ -1,0 +1,27 @@
+---
+// Нижняя панель быстрых действий на телефонах
+import Icon from './Icon.astro';
+import { site, mainPhone, tel } from '../data/site';
+---
+<div class="mbar">
+  <a href={tel(mainPhone.number)}><Icon name="phone" /><span>Позвонить</span></a>
+  <a href={site.messengers.telegram} target="_blank" rel="noopener" data-goal="messenger_click"><Icon name="telegram" /><span>Telegram</span></a>
+  <a href={site.messengers.viber} data-goal="messenger_click"><Icon name="viber" /><span>Viber</span></a>
+  <a href="#" class="mbar__main" data-request><Icon name="upload" /><span>Расчёт</span></a>
+</div>
+
+<style>
+  .mbar { display: none; }
+  @media (max-width: 600px) {
+    .mbar {
+      position: fixed; z-index: 40; left: 0; right: 0; bottom: 0;
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      background: var(--white); border-top: 1px solid var(--steel-200);
+      padding-bottom: env(safe-area-inset-bottom);
+      box-shadow: 0 -6px 20px rgb(0 0 0 / .08);
+    }
+    .mbar a { display: grid; justify-items: center; gap: 2px; padding: 9px 4px; font-size: .7rem; font-weight: 600; text-decoration: none; }
+    .mbar svg { width: 22px; height: 22px; }
+    .mbar__main { background: var(--red); color: var(--white); }
+  }
+</style>

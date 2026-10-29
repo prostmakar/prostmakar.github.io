@@ -1,0 +1,5 @@
+User-agent: *
+Disallow: /send
+Allow: /
+
+Sitemap: https://dsmet.by/sitemap-index.xml

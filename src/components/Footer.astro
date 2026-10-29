@@ -1,0 +1,83 @@
+---
+import Logo from './Logo.astro';
+import Icon from './Icon.astro';
+import { site, tel } from '../data/site';
+import { services } from '../data/services';
+import { nav } from '../data/nav';
+
+const year = new Date().getFullYear();
+const pages = nav.filter((n) => n.label !== 'Услуги').flatMap((n) => n.children ?? [n]);
+---
+<footer class="footer">
+  <div class="container">
+    <div class="footer__grid">
+      <div class="footer__brand">
+        <Logo light />
+        <p>Металлообработка полного цикла в Минске: лазерная резка листа и труб, токарные и фрезерные работы на ЧПУ, сварка. Для юридических лиц и ИП.</p>
+        <div class="footer__social">
+          <a href={site.messengers.telegram} target="_blank" rel="noopener" aria-label="Telegram" data-goal="messenger_click"><Icon name="telegram" /></a>
+          <a href={site.messengers.viber} aria-label="Viber" data-goal="messenger_click"><Icon name="viber" /></a>
+          <a href={site.messengers.whatsapp} target="_blank" rel="noopener" aria-label="WhatsApp" data-goal="messenger_click"><Icon name="whatsapp" /></a>
+          <a href={site.messengers.instagram} target="_blank" rel="noopener" aria-label="Instagram"><Icon name="instagram" /></a>
+        </div>
+      </div>
+
+      <div>
+        <h3 class="footer__title">Услуги</h3>
+        <ul class="footer__list">
+          {services.map((s) => <li><a href={`/${s.slug}/`}>{s.title}</a></li>)}
+        </ul>
+      </div>
+
+      <div>
+        <h3 class="footer__title">Компания</h3>
+        <ul class="footer__list">
+          {pages.map((p) => <li><a href={p.href}>{p.label}</a></li>)}
+        </ul>
+      </div>
+
+      <div>
+        <h3 class="footer__title">Контакты</h3>
+        <ul class="footer__list footer__contacts">
+          {site.phones.map((p) => (
+            <li><a href={tel(p.number)}><strong>{p.number}</strong></a><small>{p.label}</small></li>
+          ))}
+          {site.emails.map((m) => (
+            <li><a href={`mailto:${m.email}`}>{m.email}</a><small>{m.label}</small></li>
+          ))}
+          <li>{site.address.full}<small>{site.hours}</small></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer__bottom">
+      <span>© {year} {site.legalName}. УНП {site.unp}</span>
+      <a href="/privacy/">Политика обработки персональных данных</a>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer { position: relative; background: #0f0f11; color: var(--steel-400); padding: 72px 0 28px; font-size: .92rem; overflow: hidden; }
+  /* диагональная полоса как на визитке */
+  .footer::before {
+    content: ''; position: absolute; top: 0; right: -60px; width: 220px; height: 6px;
+    background: var(--red); transform: skewX(-35deg);
+  }
+  .footer__grid { display: grid; grid-template-columns: 1.4fr 1fr 1fr 1.2fr; gap: 48px; }
+  .footer__brand p { margin: 20px 0 24px; max-width: 340px; line-height: 1.6; }
+  .footer__title { color: var(--white); font-size: .78rem; letter-spacing: .2em; text-transform: uppercase; margin-bottom: 20px; }
+  .footer__list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+  .footer a { text-decoration: none; transition: color .2s; }
+  .footer a:hover { color: var(--white); }
+  .footer__contacts li { display: grid; }
+  .footer__contacts strong { color: var(--steel-100); font-weight: 700; }
+  .footer__contacts small { font-size: .78rem; color: #6c6c72; }
+  .footer__social { display: flex; gap: 10px; }
+  .footer__social a { display: grid; place-items: center; width: 42px; height: 42px; border: 1px solid #2c2c31; border-radius: 50%; }
+  .footer__social a:hover { background: var(--red); border-color: var(--red); }
+  .footer__social svg { width: 20px; height: 20px; }
+  .footer__bottom { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-top: 56px; padding-top: 24px; border-top: 1px solid #222226; font-size: .82rem; color: #6c6c72; }
+  @media (max-width: 980px) { .footer__grid { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 600px) { .footer__grid { grid-template-columns: 1fr; gap: 36px; } .footer { padding-bottom: 96px; } }
+</style>

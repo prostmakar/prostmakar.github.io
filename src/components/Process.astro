@@ -1,0 +1,33 @@
+---
+import { steps } from '../data/faq';
+---
+<ol class="process">
+  {steps.map((s, i) => (
+    <li class="process__step reveal" style={`transition-delay:${i * 70}ms`}>
+      <span class="process__num">{String(i + 1).padStart(2, '0')}</span>
+      <h3>{s.title}</h3>
+      <p>{s.text}</p>
+    </li>
+  ))}
+</ol>
+
+<style>
+  .process { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(5, 1fr); gap: 0; counter-reset: s; }
+  .process__step { position: relative; padding: 0 24px 0 0; }
+  .process__step::before { content: ''; position: absolute; top: 27px; left: 64px; right: 12px; height: 2px; background: var(--steel-200); }
+  .process__step:last-child::before { display: none; }
+  .process__num {
+    display: grid; place-items: center; width: 56px; height: 56px; margin-bottom: 22px;
+    background: var(--red); color: var(--white); font-weight: 800; font-size: 1.05rem;
+    clip-path: polygon(0 0, 100% 0, 100% 75%, 75% 100%, 0 100%);
+  }
+  .process h3 { margin-bottom: 8px; font-size: 1.12rem; }
+  .process p { color: var(--steel-600); font-size: .93rem; margin: 0; }
+  :global(.section--dark) .process__step::before { background: #333338; }
+  :global(.section--dark) .process p { color: var(--steel-400); }
+  @media (max-width: 1024px) {
+    .process { grid-template-columns: 1fr 1fr; gap: 36px 24px; }
+    .process__step::before { display: none; }
+  }
+  @media (max-width: 560px) { .process { grid-template-columns: 1fr; } }
+</style>

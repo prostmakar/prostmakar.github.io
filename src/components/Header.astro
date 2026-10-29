@@ -1,0 +1,187 @@
+---
+import Logo from './Logo.astro';
+import Icon from './Icon.astro';
+import { nav } from '../data/nav';
+import { site, mainPhone, tel } from '../data/site';
+
+const path = Astro.url.pathname;
+const isActive = (href: string, children?: { href: string }[]) =>
+  path === href || (children ?? []).some((c) => path === c.href);
+---
+<div class="topbar">
+  <div class="container topbar__inner">
+    <span><Icon name="pin" size={16} /> {site.address.full}</span>
+    <span><Icon name="clock" size={16} /> {site.hours}</span>
+    <a href={`mailto:${site.emails[0].email}`}><Icon name="mail" size={16} /> {site.emails[0].email}</a>
+  </div>
+</div>
+
+<header class="header" data-header>
+  <div class="container header__inner">
+    <Logo />
+
+    <nav class="nav" aria-label="Основное меню" data-nav>
+      <ul class="nav__list">
+        {nav.map((item) => (
+          <li class:list={['nav__item', { 'has-children': item.children }]}>
+            <a href={item.href} class:list={['nav__link', { 'is-active': isActive(item.href, item.children) }]}>
+              {item.label}
+              {item.children && <svg class="nav__caret" viewBox="0 0 10 6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>}
+            </a>
+            {item.children && (
+              <ul class="nav__sub">
+                {item.children.map((c) => (
+                  <li><a href={c.href} class:list={{ 'is-active': path === c.href }}>{c.label}</a></li>
+                ))}
+              </ul>
+            )}
+          </li>
+        ))}
+      </ul>
+
+      <div class="nav__mobile-extra">
+        <a class="btn btn--block" href="#" data-request>Рассчитать стоимость</a>
+        {site.phones.slice(0, 2).map((p) => (
+          <a class="nav__phone" href={tel(p.number)}>{p.number}<small>{p.label}</small></a>
+        ))}
+      </div>
+    </nav>
+
+    <div class="header__actions">
+      <a class="header__phone" href={tel(mainPhone.number)}>
+        <span class="header__phone-num">{mainPhone.number}</span>
+        <span class="header__phone-sub">{site.hours}</span>
+      </a>
+      <a class="btn header__cta" href="#" data-request>
+        <Icon name="upload" /> Отправить чертёж
+      </a>
+      <a class="header__call" href={tel(mainPhone.number)} aria-label="Позвонить"><Icon name="phone" /></a>
+      <button class="burger" type="button" aria-label="Открыть меню" aria-expanded="false" data-burger>
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<style>
+  .topbar { background: var(--graphite); color: var(--steel-400); font-size: .82rem; }
+  .topbar__inner { display: flex; gap: 32px; min-height: 38px; align-items: center; }
+  .topbar__inner > * { display: inline-flex; align-items: center; gap: 8px; text-decoration: none; }
+  .topbar__inner a:hover { color: var(--white); }
+  .topbar__inner a { margin-left: auto; }
+  .topbar svg { color: var(--red-400); }
+
+  .header {
+    position: sticky; top: 0; z-index: 50;
+    background: var(--white);
+    border-bottom: 1px solid var(--steel-100);
+    transition: box-shadow .25s;
+  }
+  .header.is-scrolled { box-shadow: 0 6px 24px rgb(0 0 0 / .08); }
+  .header__inner { display: flex; align-items: center; gap: 24px; min-height: var(--header-h); }
+
+  .nav { margin-left: auto; }
+  .nav__list { display: flex; gap: 4px; list-style: none; margin: 0; padding: 0; }
+  .nav__item { position: relative; }
+  .nav__link {
+    display: inline-flex; align-items: center; gap: 6px; padding: 10px 12px;
+    font-weight: 600; font-size: .95rem; text-decoration: none; border-radius: var(--radius);
+    position: relative;
+  }
+  .nav__link::after {
+    content: ''; position: absolute; left: 12px; right: 12px; bottom: 2px; height: 2px;
+    background: var(--red); transform: scaleX(0); transform-origin: left; transition: transform .25s var(--ease);
+  }
+  .nav__link:hover::after, .nav__link.is-active::after { transform: scaleX(1); }
+  .nav__caret { width: 10px; height: 6px; opacity: .6; }
+  .nav__sub {
+    position: absolute; top: 100%; left: 0; min-width: 270px; list-style: none; margin: 0; padding: 10px;
+    background: var(--white); border: 1px solid var(--steel-100); border-top: 3px solid var(--red);
+    box-shadow: var(--shadow); border-radius: 0 0 var(--radius) var(--radius);
+    opacity: 0; visibility: hidden; transform: translateY(6px); transition: .2s var(--ease);
+  }
+  .has-children:hover .nav__sub, .has-children:focus-within .nav__sub { opacity: 1; visibility: visible; transform: none; }
+  .nav__sub a { display: block; padding: 10px 12px; text-decoration: none; font-size: .93rem; font-weight: 500; border-radius: var(--radius); }
+  .nav__sub a:hover, .nav__sub a.is-active { background: var(--steel-50); color: var(--red); }
+  .nav__mobile-extra { display: none; }
+
+  .header__actions { display: flex; align-items: center; gap: 20px; }
+  .header__phone { display: grid; text-decoration: none; text-align: right; line-height: 1.2; }
+  .header__phone-num { font-weight: 800; font-size: 1.05rem; white-space: nowrap; }
+  .header__phone-sub { font-size: .75rem; color: var(--steel-600); }
+  .header__phone:hover .header__phone-num { color: var(--red); }
+  .header__cta { min-height: 46px; padding: 0 20px; font-size: .82rem; }
+  .header__call, .burger { display: none; }
+
+  @media (max-width: 1240px) {
+    .header__phone-sub { display: none; }
+    .nav__link { padding: 10px 8px; font-size: .9rem; }
+    .nav__link::after { left: 8px; right: 8px; }
+  }
+  @media (max-width: 1100px) {
+    .header__cta { display: none; }
+  }
+  @media (max-width: 980px) {
+    .topbar { display: none; }
+    :root { --header-h: 64px; }
+    .header__phone { display: none; }
+    .header__call {
+      display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%;
+      background: var(--red); color: var(--white);
+    }
+    .header__call svg { width: 20px; height: 20px; }
+    .header__actions { margin-left: auto; gap: 8px; }
+    .burger {
+      display: grid; gap: 5px; place-content: center; width: 44px; height: 44px;
+      background: none; border: 0; cursor: pointer;
+    }
+    .burger span { width: 24px; height: 2px; background: var(--ink); transition: .25s var(--ease); }
+    .burger[aria-expanded='true'] span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .burger[aria-expanded='true'] span:nth-child(2) { opacity: 0; }
+    .burger[aria-expanded='true'] span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    .nav {
+      position: fixed; inset: var(--header-h) 0 0 0; margin: 0; padding: 16px var(--gutter) 40px;
+      background: var(--white); overflow-y: auto;
+      opacity: 0; visibility: hidden; transform: translateY(-8px); transition: .25s var(--ease);
+    }
+    .nav.is-open { opacity: 1; visibility: visible; transform: none; }
+    .nav__list { flex-direction: column; gap: 0; }
+    .nav__item { border-bottom: 1px solid var(--steel-100); }
+    .nav__link { padding: 16px 0; font-size: 1.1rem; width: 100%; }
+    .nav__link::after { display: none; }
+    .nav__caret { display: none; }
+    .nav__sub { position: static; opacity: 1; visibility: visible; transform: none; box-shadow: none; border: 0; padding: 0 0 12px; min-width: 0; }
+    .nav__sub a { padding: 8px 0 8px 14px; color: var(--steel-600); }
+    .nav__mobile-extra { display: grid; gap: 16px; margin-top: 28px; }
+    .nav__phone { display: grid; font-weight: 800; font-size: 1.25rem; text-decoration: none; }
+    .nav__phone small { font-weight: 500; font-size: .8rem; color: var(--steel-600); }
+  }
+  @media (max-width: 420px) {
+    .header :global(.logo__sub) { display: none; }
+  }
+</style>
+
+<script>
+  const header = document.querySelector('[data-header]');
+  const burger = document.querySelector<HTMLButtonElement>('[data-burger]');
+  const navEl = document.querySelector('[data-nav]');
+
+  const onScroll = () => header?.classList.toggle('is-scrolled', window.scrollY > 8);
+  onScroll();
+  window.addEventListener('scroll', onScroll, { passive: true });
+
+  burger?.addEventListener('click', () => {
+    const open = burger.getAttribute('aria-expanded') !== 'true';
+    burger.setAttribute('aria-expanded', String(open));
+    navEl?.classList.toggle('is-open', open);
+    document.body.style.overflow = open ? 'hidden' : '';
+  });
+  navEl?.addEventListener('click', (e) => {
+    if ((e.target as HTMLElement).closest('a')) {
+      burger?.setAttribute('aria-expanded', 'false');
+      navEl.classList.remove('is-open');
+      document.body.style.overflow = '';
+    }
+  });
+</script>

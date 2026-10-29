@@ -1,0 +1,83 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import Calculator from '../components/Calculator.astro';
+import CtaSection from '../components/CtaSection.astro';
+import Icon from '../components/Icon.astro';
+import { priceList, priceNote } from '../data/prices';
+import laser from '../assets/photos/laser-sheet.jpg';
+
+const factors = [
+  { icon: 'layers', title: 'Материал и толщина', text: 'Чем толще и твёрже металл, тем медленнее резка и выше стоимость метра.' },
+  { icon: 'ruler', title: 'Сложность детали', text: 'Длина реза, количество отверстий, допуски и число операций.' },
+  { icon: 'factory', title: 'Объём партии', text: 'На серии снижается стоимость за деталь — наладка распределяется на весь тираж.' },
+  { icon: 'clock', title: 'Сроки', text: 'Стандартные сроки — без наценки. Срочные заказы обсуждаем отдельно.' },
+] as const;
+---
+<Base
+  title="Цены на металлообработку в Минске и калькулятор лазерной резки | ДС-Металл"
+  description="Цены на лазерную резку, токарные, фрезерные и сварочные работы в Минске. Онлайн-калькулятор стоимости лазерной резки. Точный расчёт по чертежу за 1 час."
+>
+  <PageHero title="Цены и калькулятор" image={laser} crumbs={[{ label: 'Цены' }]}
+    lead="Ориентировочные цены на основные виды работ и онлайн-калькулятор лазерной резки. Точную стоимость назовём по вашему чертежу — бесплатно и в течение часа." />
+
+  <section class="section section--steel" id="calculator">
+    <div class="container">
+      <div class="section-head reveal">
+        <div><span class="eyebrow">Онлайн-расчёт</span><h2>Калькулятор лазерной резки</h2></div>
+        <p>Введите параметры детали — получите ориентировочную стоимость резки без учёта металла.</p>
+      </div>
+      <div class="reveal"><Calculator /></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-head reveal">
+        <div><span class="eyebrow">Прайс</span><h2>Цены на услуги</h2></div>
+        <p>{priceNote}</p>
+      </div>
+      <div class="grid grid-2">
+        {priceList.map((g) => (
+          <div class="pl reveal">
+            <div class="pl__head">
+              <h3>{g.service}</h3>
+              <a href={`/${g.slug}/`} class="link-arrow">Об услуге <Icon name="arrow" /></a>
+            </div>
+            {g.rows.map(([n, p]) => <div class="pl__row"><span>{n}</span><strong>{p}</strong></div>)}
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--steel">
+    <div class="container">
+      <div class="section-head reveal"><div><span class="eyebrow">Ценообразование</span><h2>От чего зависит стоимость</h2></div></div>
+      <div class="grid grid-4">
+        {factors.map((f) => (
+          <div class="factor reveal">
+            <Icon name={f.icon} />
+            <h3>{f.title}</h3>
+            <p>{f.text}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <CtaSection title="Нужна точная цена? Пришлите чертёж" />
+</Base>
+
+<style>
+  .pl { border: 1px solid var(--steel-100); border-top: 4px solid var(--red); border-radius: var(--radius); background: var(--white); }
+  .pl__head { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 22px 24px; border-bottom: 1px solid var(--steel-100); }
+  .pl__head .link-arrow { font-size: .88rem; white-space: nowrap; }
+  .pl__row { display: flex; justify-content: space-between; gap: 16px; padding: 14px 24px; border-bottom: 1px solid var(--steel-100); font-size: .95rem; }
+  .pl__row:last-child { border-bottom: 0; }
+  .pl__row strong { color: var(--red); white-space: nowrap; }
+  .factor { background: var(--white); padding: 28px 24px; border-radius: var(--radius); }
+  .factor > svg { color: var(--red); width: 32px; height: 32px; margin-bottom: 16px; }
+  .factor h3 { font-size: 1.08rem; margin-bottom: 8px; }
+  .factor p { margin: 0; color: var(--steel-600); font-size: .93rem; }
+</style>

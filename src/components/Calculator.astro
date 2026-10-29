@@ -1,0 +1,119 @@
+---
+// Калькулятор лазерной резки. Ставки — в src/data/prices.ts
+import Icon from './Icon.astro';
+import { calc } from '../data/prices';
+---
+<div class="calc" data-calc={JSON.stringify(calc)}>
+  <div class="calc__form">
+    <div class="field">
+      <label for="c-mat">Материал</label>
+      <select class="input" id="c-mat" data-c="material">
+        {calc.materials.map((m) => <option value={m.id}>{m.name}</option>)}
+      </select>
+    </div>
+    <div class="field">
+      <label for="c-th">Толщина, мм</label>
+      <select class="input" id="c-th" data-c="thickness"></select>
+    </div>
+    <div class="field">
+      <label for="c-len">Длина реза одной детали, м</label>
+      <input class="input" id="c-len" type="number" min="0.01" step="0.1" value="1.5" inputmode="decimal" data-c="length" />
+      <small class="calc__hint">Периметр детали + все внутренние контуры</small>
+    </div>
+    <div class="field">
+      <label for="c-pierce">Врезок на деталь</label>
+      <input class="input" id="c-pierce" type="number" min="1" step="1" value="3" inputmode="numeric" data-c="pierces" />
+      <small class="calc__hint">1 внешний контур + число отверстий</small>
+    </div>
+    <div class="field calc__qty">
+      <label for="c-qty">Количество деталей, шт</label>
+      <input class="input" id="c-qty" type="number" min="1" step="1" value="10" inputmode="numeric" data-c="qty" />
+    </div>
+  </div>
+
+  <div class="calc__result">
+    <span class="calc__label">Ориентировочная стоимость резки</span>
+    <div class="calc__total"><span data-out="total">—</span> <small>BYN</small></div>
+    <dl class="calc__rows">
+      <div><dt>Цена за деталь</dt><dd data-out="unit">—</dd></div>
+      <div><dt>Общая длина реза</dt><dd data-out="len">—</dd></div>
+      <div><dt>Ставка за метр</dt><dd data-out="rate">—</dd></div>
+    </dl>
+    <p class="calc__note" data-out="min" hidden>Применена минимальная сумма заказа</p>
+    <a href="#" class="btn btn--block" data-request data-request-service="Лазерная резка металла" data-calc-cta>
+      <Icon name="upload" /> Точный расчёт по чертежу
+    </a>
+    <p class="calc__disclaimer">Без учёта стоимости металла. Точную цену назовём по чертежу — часто она ниже за счёт оптимального раскроя.</p>
+  </div>
+</div>
+
+<style>
+  .calc { display: grid; grid-template-columns: 1.3fr 1fr; background: var(--white); border: 1px solid var(--steel-100); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+  .calc__form { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: clamp(20px, 4vw, 40px); align-content: start; }
+  .calc__qty { grid-column: 1 / -1; }
+  .calc__hint { font-size: .78rem; color: var(--steel-400); }
+  .calc__result { background: var(--graphite); color: var(--steel-200); padding: clamp(24px, 4vw, 40px); display: flex; flex-direction: column; border-top: 4px solid var(--red); }
+  .calc__label { font-size: .78rem; letter-spacing: .14em; text-transform: uppercase; color: var(--steel-400); }
+  .calc__total { margin: 8px 0 24px; font-size: clamp(2.4rem, 5vw, 3.4rem); font-weight: 800; color: var(--white); line-height: 1.1; font-variant-numeric: tabular-nums; }
+  .calc__total small { font-size: 1.1rem; color: var(--steel-400); font-weight: 600; }
+  .calc__rows { margin: 0 0 20px; display: grid; gap: 10px; }
+  .calc__rows div { display: flex; justify-content: space-between; gap: 12px; padding-bottom: 10px; border-bottom: 1px solid #333338; font-size: .93rem; }
+  .calc__rows dd { margin: 0; font-weight: 700; color: var(--white); font-variant-numeric: tabular-nums; }
+  .calc__note { font-size: .82rem; color: var(--red-400); margin: 0 0 14px; }
+  .calc__result .btn { margin-top: auto; }
+  .calc__disclaimer { font-size: .78rem; color: var(--steel-400); margin: 14px 0 0; }
+  @media (max-width: 900px) { .calc { grid-template-columns: 1fr; } }
+  @media (max-width: 520px) { .calc__form { grid-template-columns: 1fr; } }
+</style>
+
+<script>
+  import { reachGoal } from '../scripts/metrika';
+
+  type Calc = { minOrder: number; pierce: number; materials: { id: string; name: string; rates: Record<string, number> }[] };
+
+  document.querySelectorAll<HTMLElement>('[data-calc]').forEach((root) => {
+    const cfg: Calc = JSON.parse(root.dataset.calc!);
+    const $ = <T extends HTMLElement>(k: string) => root.querySelector<T>(`[data-c="${k}"]`)!;
+    const out = (k: string) => root.querySelector<HTMLElement>(`[data-out="${k}"]`)!;
+    const mat = $<HTMLSelectElement>('material');
+    const th = $<HTMLSelectElement>('thickness');
+    const fmt = (n: number) => n.toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    let used = false;
+
+    const fillThickness = () => {
+      const m = cfg.materials.find((x) => x.id === mat.value)!;
+      const prev = th.value;
+      th.innerHTML = Object.keys(m.rates).map((t) => `<option value="${t}">${t} мм</option>`).join('');
+      if (m.rates[prev]) th.value = prev;
+    };
+
+    const update = () => {
+      const m = cfg.materials.find((x) => x.id === mat.value)!;
+      const rate = m.rates[th.value] ?? 0;
+      const len = Math.max(0, parseFloat($<HTMLInputElement>('length').value.replace(',', '.')) || 0);
+      const pierces = Math.max(0, parseInt($<HTMLInputElement>('pierces').value) || 0);
+      const qty = Math.max(1, parseInt($<HTMLInputElement>('qty').value) || 1);
+
+      const unit = len * rate + pierces * cfg.pierce;
+      const raw = unit * qty;
+      const total = Math.max(raw, cfg.minOrder);
+
+      out('total').textContent = fmt(total);
+      out('unit').textContent = fmt(unit) + ' BYN';
+      out('len').textContent = fmt(len * qty) + ' м';
+      out('rate').textContent = fmt(rate) + ' BYN/м';
+      out('min').hidden = raw >= cfg.minOrder;
+
+      root.querySelector<HTMLElement>('[data-calc-cta]')!.dataset.requestMsg =
+        `Калькулятор: ${m.name}, ${th.value} мм, рез ${len} м/дет., врезок ${pierces}, ${qty} шт. ≈ ${fmt(total)} BYN`;
+    };
+
+    mat.addEventListener('change', () => { fillThickness(); update(); });
+    root.addEventListener('input', () => {
+      update();
+      if (!used) { used = true; reachGoal('calc_use'); }
+    });
+    fillThickness();
+    update();
+  });
+</script>

@@ -1,0 +1,280 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import ServiceCard from '../components/ServiceCard.astro';
+import Process from '../components/Process.astro';
+import Faq from '../components/Faq.astro';
+import Calculator from '../components/Calculator.astro';
+import CtaSection from '../components/CtaSection.astro';
+import { site } from '../data/site';
+import { services } from '../data/services';
+import { projects } from '../data/projects';
+
+import hero from '../assets/photos/hero-shop.jpg';
+import shopTop from '../assets/photos/shop-overview.jpg';
+import turning from '../assets/photos/turning-cnc.jpg';
+import milling from '../assets/photos/milling-hall.jpg';
+import welding from '../assets/photos/welding-shop.jpg';
+
+const advantages = [
+  { icon: 'layers', title: 'Полный цикл в одном цехе', text: 'Резка, механообработка, сварка и сборка — не нужно искать нескольких подрядчиков.' },
+  { icon: 'factory', title: 'Свой металл или ваш', text: 'Работаем с металлом со склада и с давальческим сырьём заказчика.' },
+  { icon: 'ruler', title: 'Точность до 0,01 мм', text: 'Современные станки с ЧПУ и контроль размеров на каждой операции.' },
+  { icon: 'clock', title: 'Сроки от 1 дня', text: 'Простые детали — на следующий день. Серии планируем под ваш график.' },
+  { icon: 'doc', title: 'Поможем с чертежом', text: 'Нет КД? Сделаем чертёж по эскизу или образцу и согласуем с вами.' },
+  { icon: 'shield', title: 'Для юрлиц и ИП', text: 'Договор, безналичный расчёт, полный пакет закрывающих документов.' },
+] as const;
+
+const featured = projects.filter((p) => p.status === 'done').slice(0, 3);
+---
+<Base
+  title="Металлообработка в Минске — лазерная резка, ЧПУ, сварка | ДС-Металл"
+  description="Металлообработка полного цикла в Минске: лазерная резка листа до 50 мм и труб, токарные и фрезерные работы на ЧПУ, сварка. 50+ единиц оборудования. Расчёт по чертежу за 1 час."
+>
+  <!-- ============ HERO ============ -->
+  <section class="hero">
+    <Image class="hero__bg" src={hero} alt="Производственный цех ДС-Металл: лазерный станок и обрабатывающие центры" widths={[640, 1024, 1600]} sizes="100vw" loading="eager" fetchpriority="high" />
+    <div class="hero__stripe" aria-hidden="true"></div>
+    <div class="container hero__inner">
+      <div class="hero__content">
+        <span class="eyebrow">{site.slogan}</span>
+        <h1>Металлообработка <span>под задачу</span></h1>
+        <p class="hero__lead">Лазерная резка листа и труб, токарные и фрезерные работы на ЧПУ, сварка металлоконструкций. От единичной детали до серии — на собственном производстве в Минске.</p>
+        <div class="hero__actions">
+          <a href="#" class="btn" data-request><Icon name="upload" /> Отправить чертёж</a>
+          <a href="/prices/" class="btn btn--light"><Icon name="calc" /> Рассчитать онлайн</a>
+        </div>
+        <p class="hero__note"><Icon name="check" size={18} /> Расчёт стоимости за 1 час · бесплатно</p>
+      </div>
+    </div>
+    <div class="container">
+      <dl class="hero__stats">
+        {site.stats.map((s) => (
+          <div><dd>{s.value}</dd><dt>{s.label}</dt></div>
+        ))}
+      </dl>
+    </div>
+  </section>
+
+  <!-- ============ УСЛУГИ ============ -->
+  <section class="section section--steel">
+    <div class="container">
+      <div class="section-head reveal">
+        <div>
+          <span class="eyebrow">Услуги</span>
+          <h2>Что мы делаем</h2>
+        </div>
+        <p>Шесть ключевых направлений металлообработки. Комбинируем операции, чтобы вы получили готовую деталь или узел.</p>
+      </div>
+      <div class="grid grid-3">
+        {services.map((s, i) => <ServiceCard service={s} index={i} />)}
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ ПРЕИМУЩЕСТВА ============ -->
+  <section class="section">
+    <div class="container adv">
+      <div class="adv__head reveal">
+        <span class="eyebrow">Почему мы</span>
+        <h2>Надёжный подрядчик для производства</h2>
+        <p class="lead">Мы понимаем, что для заказчика главное — точность, сроки и предсказуемость. Поэтому строим работу так, чтобы вам не приходилось нас контролировать.</p>
+        <a href="/company/" class="link-arrow">О компании <Icon name="arrow" /></a>
+      </div>
+      <div class="adv__grid">
+        {advantages.map((a, i) => (
+          <div class="adv__item reveal" style={`transition-delay:${(i % 2) * 80}ms`}>
+            <span class="adv__icon"><Icon name={a.icon} /></span>
+            <h3>{a.title}</h3>
+            <p>{a.text}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ ПРОИЗВОДСТВО ============ -->
+  <section class="section section--dark prod">
+    <div class="container">
+      <div class="section-head reveal">
+        <div>
+          <span class="eyebrow">Производство</span>
+          <h2>1000 м² цеха и 50+ единиц оборудования</h2>
+        </div>
+        <p>Лазерные комплексы VMADE, обрабатывающие центры VMC1200 и WB630, токарные станки с ЧПУ, сварочный и заготовительный участки.</p>
+      </div>
+      <div class="mosaic reveal">
+        <figure class="mosaic__a"><Image src={shopTop} alt="Общий вид цеха сверху" widths={[600, 1000, 1400]} sizes="(max-width: 760px) 100vw, 60vw" /></figure>
+        <figure><Image src={turning} alt="Токарные станки с ЧПУ" widths={[400, 700]} sizes="(max-width: 760px) 100vw, 30vw" /></figure>
+        <figure><Image src={milling} alt="Фрезерные обрабатывающие центры" widths={[400, 700]} sizes="(max-width: 760px) 100vw, 30vw" /></figure>
+        <figure class="mosaic__wide"><Image src={welding} alt="Сварочный участок" widths={[400, 700]} sizes="(max-width: 760px) 100vw, 30vw" /></figure>
+      </div>
+      <div class="prod__links reveal">
+        <a href="/equipment/" class="btn">Всё оборудование <Icon name="arrow" /></a>
+        <a href="/galery/" class="btn btn--light">Фото производства</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ КАЛЬКУЛЯТОР ============ -->
+  <section class="section section--steel">
+    <div class="container">
+      <div class="section-head reveal">
+        <div>
+          <span class="eyebrow">Онлайн-расчёт</span>
+          <h2>Калькулятор лазерной резки</h2>
+        </div>
+        <p>Узнайте ориентировочную стоимость за минуту. Для точной цены пришлите чертёж — ответим в течение часа.</p>
+      </div>
+      <div class="reveal"><Calculator /></div>
+    </div>
+  </section>
+
+  <!-- ============ КАК РАБОТАЕМ ============ -->
+  <section class="section">
+    <div class="container">
+      <div class="section-head reveal">
+        <div>
+          <span class="eyebrow">Как мы работаем</span>
+          <h2>От чертежа до отгрузки — 5 шагов</h2>
+        </div>
+        <a href="#" class="btn btn--ghost" data-request>Начать с расчёта</a>
+      </div>
+      <Process />
+    </div>
+  </section>
+
+  <!-- ============ ПРОЕКТЫ ============ -->
+  <section class="section section--steel">
+    <div class="container">
+      <div class="section-head reveal">
+        <div>
+          <span class="eyebrow">Проекты</span>
+          <h2>Что мы уже сделали</h2>
+        </div>
+        <a href="/projects/" class="link-arrow">Все проекты <Icon name="arrow" /></a>
+      </div>
+      <div class="grid grid-3">
+        {featured.map((p) => (
+          <article class="pcard reveal">
+            <Image src={p.image} alt={p.title} widths={[480, 800]} sizes="(max-width: 680px) 100vw, 400px" />
+            <div class="pcard__body">
+              <span class="pcard__cat">{p.category}</span>
+              <h3>{p.title}</h3>
+              <p>{p.solution}</p>
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FAQ ============ -->
+  <section class="section">
+    <div class="container faq-wrap">
+      <div class="reveal">
+        <span class="eyebrow">Вопросы</span>
+        <h2>Частые вопросы</h2>
+        <p class="lead" style="margin-top:16px">Не нашли ответа? Позвоните или напишите — проконсультируем бесплатно.</p>
+        <a href="/faq/" class="link-arrow">Все вопросы <Icon name="arrow" /></a>
+      </div>
+      <div class="reveal"><Faq limit={5} /></div>
+    </div>
+  </section>
+
+  <CtaSection />
+
+  <!-- ============ SEO-ТЕКСТ ============ -->
+  <section class="section section--steel">
+    <div class="container prose">
+      <h2 style="margin-bottom:24px">Металлообработка в Минске для бизнеса</h2>
+      <p>{site.legalName} — производственная компания в Минске, которая выполняет металлообработку по чертежам заказчика. Мы принимаем заказы от юридических лиц и индивидуальных предпринимателей: от единичных деталей и прототипов до серийного производства.</p>
+      <p>Собственный парк оборудования позволяет закрывать полный цикл изготовления: лазерную резку листового металла толщиной до 50 мм на поле 2000×6000 мм, лазерную резку труб диаметром до 220 мм, токарную обработку до Ø400 мм с точностью 0,01 мм, фрезерную обработку на обрабатывающих центрах, ленточнопильную резку и сварку (TIG, MIG/MAG, MMA, лазерная сварка).</p>
+      <p>Работаем с углеродистой и нержавеющей сталью, алюминием, медью и латунью — как с металлом со своего склада, так и с давальческим. Стоимость рассчитываем индивидуально для каждого заказа: пришлите чертёж, и мы назовём цену и срок в течение рабочего часа.</p>
+    </div>
+  </section>
+</Base>
+
+<style>
+  /* HERO */
+  .hero { position: relative; isolation: isolate; overflow: hidden; background: #0f0f11; color: var(--white); }
+  .hero__bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -2; }
+  .hero::before {
+    content: ''; position: absolute; inset: 0; z-index: -1;
+    background: linear-gradient(100deg, rgb(12 12 14 / .96) 0%, rgb(12 12 14 / .88) 38%, rgb(12 12 14 / .35) 75%, rgb(12 12 14 / .2) 100%),
+                linear-gradient(0deg, rgb(12 12 14 / .9), transparent 40%);
+  }
+  /* Положение красной полосы: меняйте left (в % от ширины экрана) */
+  .hero__stripe {
+    position: absolute; z-index: -1; top: -10%; bottom: -10%; left: 44%; width: 46px;
+    background: var(--red); transform: skewX(-20deg);
+    box-shadow: -14px 0 0 rgb(255 255 255 / .75);
+    opacity: .95;
+  }
+  .hero__inner { min-height: min(78vh, 760px); display: flex; align-items: center; padding-block: 72px 48px; }
+  .hero__content { max-width: 860px; }
+  .hero__content .btn--light { background: rgb(12 12 14 / .7); }
+  .hero .eyebrow { color: var(--red-400); }
+  .hero h1 { font-size: clamp(1.75rem, 7.2vw, 4.6rem); line-height: 1; }
+  .hero h1 span { display: block; color: var(--red-400); }
+  .hero__lead { margin: 28px 0 36px; font-size: clamp(1.05rem, 1.6vw, 1.22rem); color: var(--steel-200); max-width: 580px; }
+  .hero__actions { display: flex; flex-wrap: wrap; gap: 14px; }
+  .hero__note { display: flex; align-items: center; gap: 8px; margin: 22px 0 0; color: var(--steel-400); font-size: .92rem; }
+  .hero__note svg { color: var(--red-400); }
+  .hero__stats {
+    display: grid; grid-template-columns: repeat(4, 1fr); margin: 0; padding: 28px 0 40px;
+    border-top: 1px solid rgb(255 255 255 / .14);
+  }
+  .hero__stats div { display: flex; flex-direction: column-reverse; padding-right: 16px; }
+  .hero__stats div + div { padding-left: 24px; border-left: 1px solid rgb(255 255 255 / .14); }
+  .hero__stats dd { margin: 0; font-size: clamp(1.6rem, 3vw, 2.4rem); font-weight: 800; line-height: 1.1; }
+  .hero__stats dt { color: var(--steel-400); font-size: .88rem; margin-top: 4px; }
+  @media (max-width: 900px) {
+    .hero__stripe { display: none; }
+    .hero::before { background: linear-gradient(180deg, rgb(12 12 14 / .78), rgb(12 12 14 / .94)); }
+  }
+  @media (max-width: 760px) {
+    .hero__stats { grid-template-columns: 1fr 1fr; gap: 20px 0; }
+    .hero__stats div:nth-child(3) { padding-left: 0; border-left: 0; }
+    .hero__actions .btn { flex: 1 1 100%; }
+  }
+
+  /* ПРЕИМУЩЕСТВА */
+  .adv { display: grid; grid-template-columns: 0.9fr 1.3fr; gap: clamp(32px, 6vw, 96px); align-items: start; }
+  .adv__head { position: sticky; top: calc(var(--header-h) + 32px); }
+  .adv__head .lead { margin: 20px 0 24px; }
+  .adv__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--steel-100); border: 1px solid var(--steel-100); }
+  .adv__item { background: var(--white); padding: 32px 28px; }
+  .adv__icon { display: grid; place-items: center; width: 52px; height: 52px; margin-bottom: 20px; color: var(--red); background: rgb(138 26 40 / .07); border-radius: 50%; }
+  .adv__item h3 { margin-bottom: 8px; font-size: 1.12rem; }
+  .adv__item p { margin: 0; color: var(--steel-600); font-size: .95rem; }
+  @media (max-width: 900px) { .adv { grid-template-columns: 1fr; } .adv__head { position: static; } }
+  @media (max-width: 560px) { .adv__grid { grid-template-columns: 1fr; } }
+
+  /* ПРОИЗВОДСТВО */
+  .mosaic { display: grid; grid-template-columns: 2fr 1fr 1fr; grid-template-rows: 240px 240px; gap: 12px; }
+  .mosaic figure { margin: 0; overflow: hidden; border-radius: var(--radius); background: var(--graphite-2); }
+  .mosaic img { width: 100%; height: 100%; object-fit: cover; transition: transform .7s var(--ease); }
+  .mosaic figure:hover img { transform: scale(1.04); }
+  .mosaic__a { grid-row: span 2; }
+  .mosaic__wide { grid-column: span 2; }
+  .prod__links { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 36px; }
+  @media (max-width: 760px) {
+    .mosaic { grid-template-columns: 1fr 1fr; grid-template-rows: 220px 160px 160px; }
+    .mosaic__a { grid-column: span 2; grid-row: auto; }
+    .mosaic__wide { grid-column: span 2; }
+  }
+
+  /* ПРОЕКТЫ */
+  .pcard { background: var(--white); border-radius: var(--radius); overflow: hidden; border: 1px solid var(--steel-100); }
+  .pcard img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
+  .pcard__body { padding: 24px; }
+  .pcard__cat { font-size: .75rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--red); }
+  .pcard h3 { margin: 8px 0; }
+  .pcard p { margin: 0; color: var(--steel-600); font-size: .93rem; }
+
+  /* FAQ */
+  .faq-wrap { display: grid; grid-template-columns: 0.8fr 1.4fr; gap: clamp(32px, 6vw, 96px); }
+  @media (max-width: 900px) { .faq-wrap { grid-template-columns: 1fr; } }
+</style>
